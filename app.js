@@ -45,6 +45,9 @@ app.use('/', authRoutes);
 const travelCardRoutes = require('./routes/travel-card-routes');
 app.use('/', travelCardRoutes);
 
+const commentsRoutes = require ('./routes/comments-routes');
+app.use('/', commentsRoutes);
+
 app.use((req, res, next) => {
   // If no routes match, send them the Angular HTML.
   res.sendFile(__dirname + "/public/index.html");
