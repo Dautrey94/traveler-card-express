@@ -44,23 +44,29 @@ commentsRoutes.post('/api/travelcards/:id/comments', (req, res, next) =>{
 
        // Add Review to travelcard comments Array
        travelCard.comments.push(newComment);
+       newComment.save(err =>{
+           console.log(err)
 
-       travelCard.save((err) => {
-        if(err){
-            // res.status(500).json({message: "Some weird error from DB."});
-            res.status(500).json({message: `${err}`});
-            return;
-        }
-        req.user.password = undefined;
-        travelCard.user = req.user;
-
-        res.status(200).json(travelCard);
+           travelCard.save((err) => {
+            if(err){
+                // res.status(500).json({message: "Some weird error from DB."});
+                res.status(500).json({message: `${err}`});
+                return;
+            }
+            req.user.password = undefined;
+            travelCard.user = req.user;
+    
+            res.status(200).json(travelCard);
+           
+            });
+       })
        
-        });
     });
 });
 
 commentsRoutes.delete("/api/travelcards/:travelCardId/comments/:id", (req, res, next) => {
+    const travelCardId = req.params.travelCardId;
+    const commentId = req.params.id;
     if (!req.user) {
       res.status(401).json({ message: "Log in to delete comment." });
       return;
@@ -69,21 +75,35 @@ commentsRoutes.delete("/api/travelcards/:travelCardId/comments/:id", (req, res, 
       res.status(400).json({ message: "ID is not valid." });
       return;
     }
-  
-    // Find Travel Card By ID
 
-    // Search By ID For Comment to Delete Inside Comments Array on Travel Card
+    travelCard.findById(travelCardId, (err, foundcard) => {
+        if (err) {
+            res.json(err);
+            return;
+          }
 
-    Comment.findByIdAndRemove({ _id: req.params.id }, err => {
-      if (err) {
-        res.json(err);
-        return;
-      }
-  
-      res.json({
-        message: "Comment has been deleted."
-      });
-    });
+          console.log("travel card before:", foundcard)
+          Comment.findByIdAndRemove(commentId, (err, foundComment) => {
+            console.log("==============================")
+            if (err) {
+              res.json("error is:",err);
+              return;
+            }
+            console.log("comment is:", foundComment)
+            console.log("==============================")
+
+            foundcard.save((err) => {
+                if(err){
+                    console.log("err is: ", err)
+                }
+                // console.log("err while saving card: ", err)
+                res.json({
+                    message: "Comment has been deleted."
+                  });
+            })
+            console.log("travel card after:", foundcard)
+          });   
+    })
   });
 
 module.exports = commentsRoutes;
