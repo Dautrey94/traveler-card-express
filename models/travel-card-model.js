@@ -1,7 +1,7 @@
 const mongoose = require ('mongoose');
 const Schema = mongoose.Schema;
 const User = require('../models/user-model');
-const Comments = require('../models/comments-model');
+const Comment = require('../models/comments-model');
 
 const travelCardSchema = new Schema ({
     owner:          { 
@@ -12,7 +12,7 @@ const travelCardSchema = new Schema ({
     number:         String,
     socialMedia:    String,
     travelPlan:     String,
-    comments:       [Comments.schema]
+    comments:       [Comment.schema]
 
 });
 

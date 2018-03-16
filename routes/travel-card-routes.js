@@ -30,7 +30,7 @@ travelCardRoutes.post('/api/travelcards/new', (req,res,next) => {
     });
 });
 
-travelCardRoutes.get('/api/travelcards', (req, res, next)=>{
+travelCardRoutes.get('/api/travelcards/', (req, res, next)=>{
     if (!req.user) {
         res.status(401).json({ message: "Log in to see travelcards." });
         return;
@@ -43,6 +43,19 @@ travelCardRoutes.get('/api/travelcards', (req, res, next)=>{
           res.status(200).json(allTheCards);
       })
 });
+travelCardRoutes.get('/api/travelcards/:id', (req, res, next)=>{
+  if (!req.user) {
+      res.status(401).json({ message: "Log in to see travelcards." });
+      return;
+    }
+    travelCard.find({}, (err, allTheCards)=>{
+      if (err) {
+          res.status(500).json({ message: "Phones find went bad." });
+          return;
+        }
+        res.status(200).json(allTheCards);
+    })
+  });
 travelCardRoutes.put('/api/travelcards/:id', (req, res, next) => {
     if (!req.user) {
       res.status(401).json({ message: "Log in to update travel plan." });
