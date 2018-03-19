@@ -44,16 +44,17 @@ travelCardRoutes.get('/api/travelcards', (req, res, next)=>{
       });
 });
 travelCardRoutes.get('/api/travelcards/:id', (req, res, next)=>{
+  const travelcardId = req.params.id;
   if (!req.user) {
       res.status(401).json({ message: "Log in to see travelcards." });
       return;
     }
-    travelCard.find({}, (err, allTheCards)=>{
+    travelCard.findById(travelcardId, (err, theOneCard)=>{
       if (err) {
-          res.status(500).json({ message: "Phones find went bad." });
+          res.status(500).json({ message: "Card find went bad." });
           return;
         }
-        res.status(200).json(allTheCards);
+        res.status(200).json(theOneCard);
     })
   });
 travelCardRoutes.put('/api/travelcards/:id', (req, res, next) => {
