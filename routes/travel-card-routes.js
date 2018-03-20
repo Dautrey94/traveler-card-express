@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const express = require('express');
 const travelCardRoutes = express.Router();
 const travelCard = require('../models/travel-card-model');
+const User = require('../models/user-model');
 
 
 travelCardRoutes.post('/api/travelcards/new', (req,res,next) => {
@@ -43,6 +44,34 @@ travelCardRoutes.get('/api/travelcards', (req, res, next)=>{
           res.status(200).json(allTheCards);
       });
 });
+
+travelCardRoutes.post('/api/user/:id/addCards', (req, res, next) => {
+  if (!req.user) {
+    res.status(401).json({ message: "Log in to see travelcards." });
+    return;
+  }
+// console.log("body from frontend: ", req.body)
+  const cardId = req.body.theId;
+  console.log("cardId: ===================", cardId)
+  travelCard.findById(cardId, (err, foundcard) => {
+    // console.log("card in the backend: ", foundcard)
+    // push the foundCard into savedCards array of currently logged in user
+    req.user.savedCards.push(foundcard);
+    // save the changes in the user (save the card in savedCards array inside the logged in user)
+    req.user.save(err => {
+      if(err){
+        res.status(500).json({message: "Some weird error from DB."});
+        return;
+      }
+
+    });
+    console.log("saved user: ", req.user)
+  })
+})
+
+// get route for above
+
+
 travelCardRoutes.get('/api/travelcards/:id', (req, res, next)=>{
   const travelcardId = req.params.id;
   if (!req.user) {
@@ -67,8 +96,8 @@ travelCardRoutes.put('/api/travelcards/:id', (req, res, next) => {
         return;
     }
     const updates = {
-        number: req.body.number,
-        socialMedia: req.body.socialMedia,
+        number: req.body.travelCardNum,
+        socialMedia: req.body.travelCardSocial,
         travelPlan: req.body.travelPlan
     };
 
@@ -105,7 +134,6 @@ travelCardRoutes.delete("/api/travelcards/:id", (req, res, next) => {
     });
   });
 });
-
 
 
 module.exports = travelCardRoutes;
