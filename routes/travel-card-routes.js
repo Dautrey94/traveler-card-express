@@ -46,6 +46,7 @@ travelCardRoutes.get('/api/travelcards', (req, res, next)=>{
 });
 
 travelCardRoutes.post('/api/user/:id/addCards', (req, res, next) => {
+  const isAdded = true;
   if (!req.user) {
     res.status(401).json({ message: "Log in to see travelcards." });
     return;
@@ -57,6 +58,7 @@ travelCardRoutes.post('/api/user/:id/addCards', (req, res, next) => {
     // console.log("card in the backend: ", foundcard)
     // push the foundCard into savedCards array of currently logged in user
     req.user.savedCards.push(foundcard);
+    const isAdded = false;
     // save the changes in the user (save the card in savedCards array inside the logged in user)
     req.user.save(err => {
       if(err){
@@ -65,11 +67,27 @@ travelCardRoutes.post('/api/user/:id/addCards', (req, res, next) => {
       }
 
     });
-    console.log("saved user: ", req.user)
+    res.status(200).json(isAdded)
+    // console.log("saved user: ", req.user)
   })
 })
 
 // get route for above
+
+travelCardRoutes.get("/api/users/:id/savedCards", (req, res, next) => {
+  const userId = req.params.id;
+  if (!req.user) {
+    res.status(401).json({ message: "Log in to see travelcards." });
+    return;
+  }
+  User.findById(userId, (err, foundUser) => {
+    if(err){
+      res.json(err);
+      return;
+    }
+    res.status(200).json(foundUser);
+  })
+})
 
 
 travelCardRoutes.get('/api/travelcards/:id', (req, res, next)=>{
